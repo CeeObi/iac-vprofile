@@ -73,3 +73,5 @@ jobs:
               #plan refers to id=plan above
               if: steps.plan.outcome == 'failure'
               run: exit 1
+
+            #Stops at plan - the subsequent steps would commence once the pull request is successfully merged.
