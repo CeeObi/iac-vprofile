@@ -1,0 +1,75 @@
+# Name of the GitHub Actions workflow
+name: "Vprofile IAC"
+
+# Define the events that trigger this workflow
+on:
+    # Trigger the workflow on push events
+    push:
+        # Define the specific branches that should trigger the workflow
+        branches:
+            - main # Trigger workflow on push to the 'main' branch
+            - stage # Trigger workflow on push to the 'stage' branch
+
+        paths:
+            - terraform/** # Trigger workflow on push to this path, and if the branches matched main or stage above.
+
+    #Also Trigger the workflow on pull request events
+    pull_request:
+        # Define the specific branches that should trigger the workflow
+        branches:
+            - main
+        paths:
+            - terraform/** # Trigger workflow on pull request to this path, and if the branche matched main above.
+
+env:
+    #Credentials for deployment to AWS
+    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #S3 bucket for the Terraform state
+    BUCKET_TF_STATE: ${{ secrets.BUCKET_TF_STATE }}
+    AWS_REGION: us-west-1
+    EKS_CLUSTER: vprofile-eks
+
+# Define the jobs that will run as part of the workflow
+jobs:
+    # Job name, can be anything like 'build', 'deploy', etc.
+    terraform:
+        name: "Apply terraform code changes"
+        # The environment/os that the job will run on (e.g., ubuntu-latest)
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                shell: bash
+                working-directory: ./terraform
+
+        # Define the steps that make up the job
+        steps:
+            # Step 1: Checkout the repository code
+            - name: Checkout source code
+              uses: actions/checkout@v4 # Action to checkout the code from the repository
+
+              # Step 2: Set/install up Terraform
+            - name: Set up Terraform
+              uses: hashicorp/setup-terraform@v2
+
+            - name: Terraform init
+              id: init #id is used instead, if you want to refer to this task later.
+              run: terraform init -backend-config="bucket=$BUCKET_TF_STATE"
+
+            - name: Terraform format
+              id: fmt
+              run: terraform fmt -check
+
+            - name: Terrafofm validate
+              id: Validate
+              run: terraform validate
+
+            - name: Terraform plan
+              id: plan
+              run: terraform plan -no-color -input=false -out planfile
+              continue-on-error: true #basically cos we cant entirely rely on above fail, thus step below.env:
+
+            - name: Terraform plan status
+              #plan refers to id=plan above
+              if: steps.plan.outcome == 'failure'
+              run: exit 1
