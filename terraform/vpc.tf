@@ -16,14 +16,14 @@ module "vpc" {
   enable_dns_hostnames = true
 
 
-#Define public and private tags: general requirement for eks in the format as well
+  #Define public and private tags: general requirement for eks in the format as well
   public_subnet_tags = {
-    "kubernetes.io/cluster/${local.cluster_name}" = "shared"      #local.cluster_name - from the main.tf file.
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared" #local.cluster_name - from the main.tf file.
     "kubernetes.io/role/elb"                      = 1
   }
 
   private_subnet_tags = {
-    "kubernetes.io/cluster/${local.cluster_name}" = "shared" 
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
     "kubernetes.io/role/internal-elb"             = 1
   }
 }

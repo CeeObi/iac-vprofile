@@ -26,14 +26,14 @@ terraform {
     }
   }
 
-# Backend is very important so that it saves the state management instruction on a central s3 bucket location instaed of locally on your computer, which may result to alot of issues
-#as it wouyld recreate the instruction again for different developers running the terraform
-    backend "s3" {
-    bucket = "vprofile-app-actions"     # The name of the S3 bucket where Terraform will store the state
-    key    = "terraform.tfstate"         # The path within the S3 bucket to the state file
-    region = "us-west-1"                 # The AWS region where the S3 bucket is located
+  # Backend is very important so that it saves the state management instruction on a central s3 bucket location instaed of locally on your computer, which may result to alot of issues
+  #as it wouyld recreate the instruction again for different developers running the terraform
+  backend "s3" {
+    bucket = "vprofile-app-actions" # The name of the S3 bucket where Terraform will store the state
+    key    = "terraform.tfstate"    # The path within the S3 bucket to the state file
+    region = "us-west-1"            # The AWS region where the S3 bucket is located
   }
-  
+
   # required_version = "~> 1.6.3"
 }
 ##b
