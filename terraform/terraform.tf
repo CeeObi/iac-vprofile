@@ -34,7 +34,7 @@ terraform {
     region = "us-west-1"                 # The AWS region where the S3 bucket is located
   }
   
-  required_version = "~> 1.6.3"
+  # required_version = "~> 1.6.3"
 }
 ##b
 ##
